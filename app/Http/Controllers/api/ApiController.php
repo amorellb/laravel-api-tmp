@@ -17,7 +17,7 @@ class ApiController extends Controller
     {
 //        return view('apiView');
 //        return "Ejecutando api";
-        $contacts = DB::table('contacts')->all();
+        $contacts = DB::table('contacts')->get();
         return $contacts;
     }
 
