@@ -3,12 +3,14 @@
 <body>
 <main>
     <div id="response">
-        Hello world
-{{--        {{ SetActiveRoute('properties') }}--}}
-        <button onclick="api_js_index()" class="nav-link ">
-            <i class="fas fa-building nav-icon"></i>
-            Create properties
-        </button>
+                <button onclick="getContacts()" class="btn btn-primary">
+                    Contacts
+                </button>
+        <script>
+            window.addEventListener('load', () => {
+                getContacts();
+            })
+        </script>
         <div id="result"></div>
     </div>
     <script src="js/apirest.js"></script>
