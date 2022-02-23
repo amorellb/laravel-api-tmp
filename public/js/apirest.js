@@ -10,29 +10,35 @@
 function buttons(id) {
     return '<td>' +
         `<button class="btn-show btn btn-success ms-2" onclick="getContact(${id})">Show</button>` +
-        `<button class="btn-edit btn btn-secondary ms-2" onclick="editContact(${id})">Edit</button>` +
+        `<button class="btn-edit btn btn-secondary ms-2" onclick="showForm(${id})">Edit</button>` +
         `<button class="btn-delete btn btn-danger ms-2" onclick="delContact(${id})">Delete</button>` +
         '</td>';
 }
 
 function renderContacts(contacts) {
-    let markup = '<table class="table"><th>Name</th><th>Email</th><th>Phone</th><th>Address</th>';
+    let markup = '<table class="table"><thead><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Address</th><th>Actions</th></thead><tbody>';
     contacts.forEach(contact => {
-        markup += `<tr><td>${contact.name}</td><td>${contact.email}</td><td>${contact.phone}</td><td>${contact.address}</td>${buttons(contact.id)}</td>`
+        markup += `<tr><td>${contact.id}</td><td>${contact.name}</td><td>${contact.email}</td><td>${contact.phone}</td><td>${contact.address}</td>${buttons(contact.id)}</td>`
     })
-    return markup + '</table>';
+    return markup + '</tbody></table>';
 }
 
 function renderContact(contact) {
-    let markup = '<table class="table"><th>Name</th><th>Email</th><th>Phone</th><th>Address</th>';
-    markup += `<tr><td>${contact.name}</td><td>${contact.email}</td><td>${contact.phone}</td><td>${contact.address}</td></tr>`
+    let markup = '<table class="table"><thead><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Address</th></thead>';
+    markup += `<tdoby><tr><td>${contact.id}</td><td>${contact.name}</td><td>${contact.email}</td><td>${contact.phone}</td><td>${contact.address}</td></tr></tdoby>`
     return markup + '</table>';
 }
 
 function getContacts() {
     fetch('/api/apirest')
         .then(res => res.json())
-        .then(data => document.getElementById('result').innerHTML = renderContacts(data))
+        .then(data => {
+            console.log('Contacts shown successfully')
+            const sortedData = data.data.sort((a, b) => {
+                return a.id - b.id;
+            })
+            document.getElementById('result').innerHTML = renderContacts(sortedData);
+        })
         .catch(err => console.error(err));
 }
 
@@ -40,24 +46,100 @@ function getContact(id) {
     fetch(`/api/apirest/${id}`)
         .then(res => res.json())
         .then(data => {
-            console.log(data)
-            document.getElementById('result').innerHTML = renderContact(data)
+            console.log('Contact shown successfully')
+            document.getElementById('result').innerHTML = renderContact(data.data)
         })
         .catch(err => console.error(err));
 }
 
-function editContact(id, uploadData) {
+function addContact() {
+    const inputName = document.querySelector('#name');
+    const inputEmail = document.querySelector('#email');
+    const inputPhone = document.querySelector('#phone');
+    const inputAddress = document.querySelector('#address');
+
+    fetch(`/api/apirest`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            name: inputName.value,
+            email: inputEmail.value,
+            phone: inputPhone.value,
+            address: inputAddress.value
+        })
+    })
+        .then(res => {
+            if (res.ok) {
+                console.log('Contact added successfully')
+            }
+        })
+        .catch(err => console.error(err));
+    setTimeout(() => {
+        location.reload()
+    }, 1000)
+}
+
+function editContact(id) {
+    const inputName = document.querySelector('#name');
+    const inputEmail = document.querySelector('#email');
+    const inputPhone = document.querySelector('#phone');
+    const inputAddress = document.querySelector('#address');
+
     fetch(`/api/apirest/${id}`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(uploadData)
+        body: JSON.stringify({
+            name: inputName.value,
+            email: inputEmail.value,
+            phone: inputPhone.value,
+            address: inputAddress.value
+        })
     })
+        .then(res => {
+            if (res.ok) {
+                console.log('Contact edited successfully')
+            }
+        })
         .catch(err => console.error(err));
+    setTimeout(() => {
+        location.reload()
+    }, 1000)
 }
 
 function delContact(id) {
     fetch(`/api/apirest/${id}`, {method: 'DELETE'})
+        .then(res => {
+            if (res.ok) {
+                console.log('Contact deleted successfully')
+            }
+        })
         .catch(err => console.error(err));
+    setTimeout(() => {
+        location.reload()
+    }, 1000)
+}
+
+function renderForm(id) {
+    return `
+        <div class="needs-validation">
+            <label class="form-label" for="name">Name</label>
+            <input id="name" class="form-control" type="text"/>
+            <label class="form-label" for="email">Email</label>
+            <input id="email" class="form-control" type="text"/>
+            <label class="form-label" for="phone">Phone</label>
+            <input id="phone" class="form-control" type="text"/>
+            <label class="form-label" for="address">Address</label>
+            <input id="address" class="form-control" type="text"/>
+            <button class="btn btn-primary my-3" onclick="addContact()">Add contact</button>
+            <button class="btn btn-secondary my-3" onclick="editContact(${id})">Edit contact</button>
+        </div>
+    `;
+}
+
+function showForm(id) {
+    document.getElementById('result').innerHTML = renderForm(id);
 }
