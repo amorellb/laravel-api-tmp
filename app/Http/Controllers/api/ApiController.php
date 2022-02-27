@@ -56,7 +56,7 @@ class ApiController extends Controller
      * Update the specified resource in storage.
      *
      * @param Request $request
-     * @param Contact $contact
+     * @param $id
      * @return JsonResponse
      */
     public function update(Request $request, $id): JsonResponse
@@ -70,7 +70,7 @@ class ApiController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param Contact $contact
+     * @param $id
      * @return JsonResponse
      */
     public function destroy($id): JsonResponse
