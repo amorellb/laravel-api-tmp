@@ -10,7 +10,7 @@
 function buttons(id) {
     return '<td>' +
         `<button class="btn-show btn btn-success ms-2" onclick="getContact(${id})">Show</button>` +
-        `<button class="btn-edit btn btn-secondary ms-2" onclick="showForm(${id})">Edit</button>` +
+        `<button class="btn-edit btn btn-warning ms-2" onclick="showForm(${id}, 'edit')">Edit</button>` +
         `<button class="btn-delete btn btn-danger ms-2" onclick="delContact(${id})">Delete</button>` +
         '</td>';
 }
@@ -123,7 +123,13 @@ function delContact(id) {
     }, 1000)
 }
 
-function renderForm(id) {
+function renderForm(id, action = 'show') {
+    let button = '';
+    if (action === 'edit') {
+        button = `<button class="btn btn-warning my-3" onClick="editContact(${id})">Edit contact</button>`
+    } else if (action === 'show') {
+        button = '<button class="btn btn-primary my-3" onClick="addContact()">Add contact</button>'
+    }
     return `
         <div class="needs-validation">
             <label class="form-label" for="name">Name</label>
@@ -134,12 +140,11 @@ function renderForm(id) {
             <input id="phone" class="form-control" type="text"/>
             <label class="form-label" for="address">Address</label>
             <input id="address" class="form-control" type="text"/>
-            <button class="btn btn-primary my-3" onclick="addContact()">Add contact</button>
-            <button class="btn btn-secondary my-3" onclick="editContact(${id})">Edit contact</button>
+            ${button}
         </div>
     `;
 }
 
-function showForm(id) {
-    document.getElementById('result').innerHTML = renderForm(id);
+function showForm(id, action) {
+    document.getElementById('result').innerHTML = renderForm(id, action);
 }
