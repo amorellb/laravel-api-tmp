@@ -7,6 +7,8 @@
 //     xhttp.send();
 // }
 
+let contacts = [];
+
 function buttons(id) {
     return '<td>' +
         `<button class="btn-show btn btn-success ms-2" onclick="getContact(${id})">Show</button>` +
@@ -38,6 +40,7 @@ function getContacts() {
                 return a.id - b.id;
             })
             document.getElementById('result').innerHTML = renderContacts(sortedData);
+            contacts = data.data;
         })
         .catch(err => console.error(err));
 }
@@ -46,81 +49,75 @@ function getContact(id) {
     fetch(`/api/apirest/${id}`)
         .then(res => res.json())
         .then(data => {
-            console.log('Contact shown successfully')
-            document.getElementById('result').innerHTML = renderContact(data.data)
+            console.log('Contact shown successfully');
+            document.getElementById('result').innerHTML = renderContact(data.data);
         })
         .catch(err => console.error(err));
 }
 
-function addContact() {
+function createContact() {
     const inputName = document.querySelector('#name');
     const inputEmail = document.querySelector('#email');
     const inputPhone = document.querySelector('#phone');
     const inputAddress = document.querySelector('#address');
 
+    return {
+        name: inputName.value,
+        email: inputEmail.value,
+        phone: inputPhone.value,
+        address: inputAddress.value
+    }
+}
+
+function addContact() {
     fetch(`/api/apirest`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-            name: inputName.value,
-            email: inputEmail.value,
-            phone: inputPhone.value,
-            address: inputAddress.value
-        })
+        body: JSON.stringify(createContact())
     })
         .then(res => {
             if (res.ok) {
                 console.log('Contact added successfully')
+                setTimeout(() => {
+                    location.reload()
+                }, 1000)
             }
         })
         .catch(err => console.error(err));
-    setTimeout(() => {
-        location.reload()
-    }, 1000)
 }
 
 function editContact(id) {
-    const inputName = document.querySelector('#name');
-    const inputEmail = document.querySelector('#email');
-    const inputPhone = document.querySelector('#phone');
-    const inputAddress = document.querySelector('#address');
-
     fetch(`/api/apirest/${id}`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-            name: inputName.value,
-            email: inputEmail.value,
-            phone: inputPhone.value,
-            address: inputAddress.value
-        })
+        body: JSON.stringify(createContact())
     })
         .then(res => {
             if (res.ok) {
-                console.log('Contact edited successfully')
+                console.log('Contact edited successfully');
+                setTimeout(() => {
+                    location.reload();
+                }, 1000)
             }
         })
         .catch(err => console.error(err));
-    setTimeout(() => {
-        location.reload()
-    }, 1000)
 }
 
 function delContact(id) {
     fetch(`/api/apirest/${id}`, {method: 'DELETE'})
         .then(res => {
             if (res.ok) {
-                console.log('Contact deleted successfully')
+                console.log('Contact deleted successfully');
+                setTimeout(() => {
+                    location.reload();
+                }, 1000)
             }
         })
         .catch(err => console.error(err));
-    setTimeout(() => {
-        location.reload()
-    }, 1000)
 }
 
 function renderForm(id, action = 'show') {
@@ -130,16 +127,19 @@ function renderForm(id, action = 'show') {
     } else if (action === 'show') {
         button = '<button class="btn btn-primary my-3" onClick="addContact()">Add contact</button>'
     }
+
+    const [contact] = contacts.filter(contact => contact.id === id);
+
     return `
         <div class="needs-validation">
             <label class="form-label" for="name">Name</label>
-            <input id="name" class="form-control" type="text"/>
+            <input id="name" class="form-control" type="text" value="${contact ? contact.name : ''}"/>
             <label class="form-label" for="email">Email</label>
-            <input id="email" class="form-control" type="text"/>
+            <input id="email" class="form-control" type="text" value="${contact ? contact.email : ''}"/>
             <label class="form-label" for="phone">Phone</label>
-            <input id="phone" class="form-control" type="text"/>
+            <input id="phone" class="form-control" type="text" value="${contact ? contact.phone : ''}"/>
             <label class="form-label" for="address">Address</label>
-            <input id="address" class="form-control" type="text"/>
+            <input id="address" class="form-control" type="text" value="${contact ? contact.address : ''}"/>
             ${button}
         </div>
     `;
