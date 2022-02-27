@@ -6,7 +6,7 @@
 //     xhttp.open('GET', '/api/apirest', true);
 //     xhttp.send();
 // }
-
+const URL = '/api/apirest/'
 let contacts = [];
 
 function buttons(id) {
@@ -32,7 +32,7 @@ function renderContact(contact) {
 }
 
 function getContacts() {
-    fetch('/api/apirest')
+    fetch(URL)
         .then(res => res.json())
         .then(data => {
             console.log('Contacts shown successfully')
@@ -46,7 +46,7 @@ function getContacts() {
 }
 
 function getContact(id) {
-    fetch(`/api/apirest/${id}`)
+    fetch(URL + id)
         .then(res => res.json())
         .then(data => {
             console.log('Contact shown successfully');
@@ -70,7 +70,7 @@ function createContact() {
 }
 
 function addContact() {
-    fetch(`/api/apirest`, {
+    fetch(URL, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -89,7 +89,7 @@ function addContact() {
 }
 
 function editContact(id) {
-    fetch(`/api/apirest/${id}`, {
+    fetch(URL + id, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json'
@@ -108,7 +108,7 @@ function editContact(id) {
 }
 
 function delContact(id) {
-    fetch(`/api/apirest/${id}`, {method: 'DELETE'})
+    fetch(URL + id, {method: 'DELETE'})
         .then(res => {
             if (res.ok) {
                 console.log('Contact deleted successfully');
